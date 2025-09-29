@@ -1,0 +1,12 @@
+# Gerador de Receitas em PDF
+
+Este projeto permite criar e guardar receitas de forma simples e prática.
+
+## Objetivo
+Facilitar a organização das suas receitas sem necessidade de abrir o Word ou o Bloco de Notas.  
+Com apenas alguns cliques, pode criar e guardar um PDF com as suas receitas favoritas.
+
+## Como usar
+1. Introduz o nome da tua receita.
+2. Adiciona os ingredientes e passos.
+3. Clica no botão **Gerar PDF** que faz o download do ficheiro gerado.

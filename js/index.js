@@ -25,9 +25,9 @@ function toggleAddIngridient(){
 }
 
 function addIngredient() {
-    const name = document.getElementById('createProductName').value;
-    const unit = document.getElementById('createIngridientUnit').value;
-    const quantity = document.getElementById('createIngridientQuantity').value;
+    const name = getInputValue('createProductName');
+    const unit = getInputValue('createIngridientUnit');
+    const quantity = getInputValue('createIngridientQuantity');
     if (name && unit && quantity) {
         ingredients.push({ name, unit, quantity });
         updateIngredientList();
@@ -346,13 +346,15 @@ function addIngredients(doc, yPosition) {
         var text = `- ${ingredient.quantity} ${ingredient.unit} de ${ingredient.name}`;
         if (yPosition > 280) { 
             doc = createNewPage(doc);
-            yPosition = 20; 
+            yPosition = 35; 
         }
 
         if(text.length > 90){
-            console.log("Text: " + text);
-            console.log("Text Length:" + text.length);
             const splitText = doc.splitTextToSize(text, 180); 
+            if(yPosition + splitText.length * 6 > 280){
+                doc = createNewPage(doc);
+                yPosition = 35;
+            }
             doc.text(splitText, 10, yPosition);
             yPosition += splitText.length * 6; 
         } else {
@@ -375,11 +377,15 @@ function addMethodPDF(doc, yPosition) {
         var text = `${ingredient.index}. ${ingredient.description}`;
         if (yPosition > 280) { 
             doc = createNewPage(doc);
-            yPosition = 20; 
+            yPosition = 35; 
         }
 
         if(text.length > 90){
             const splitText = doc.splitTextToSize(text, 180); 
+            if(yPosition + splitText.length * 6 > 280){
+                doc = createNewPage(doc);
+                yPosition = 35;
+            }
             doc.text(splitText, 10, yPosition);
             yPosition += splitText.length * 6;
         } else {
@@ -421,10 +427,7 @@ function setImage(doc) {
 
 
 
-
-
 /* PDF Functions - End */
-
 
 
 /* Utils Functions - Start */
@@ -438,6 +441,9 @@ function changeInputValue(name,value){
     document.getElementById(name).value = value;
 }
 
+function getInputValue(name){
+    return document.getElementById(name).value;
+}
 
 
 function createAlertMessage(iconType,title,text){
