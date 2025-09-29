@@ -1,4 +1,5 @@
 const ingredients = [];
+const methods = [];
 
 
 /* Add Ingredient Functions - Start */
@@ -147,19 +148,162 @@ function saveChanges() {
 /* Edit Ingredient Functions - End */
 
 
+/* Create Method Functions - Start */
+
+function showFormMethod(){
+    const methodForm = document.getElementById('createMethod1');
+    const isCurrentlyVisible = methodForm.style.display === 'block';
+    const addMethodM = document.getElementById('addMethodButtonElement');
+
+    if (isCurrentlyVisible) {
+        changeStyleDisplay('createMethod1','none');
+        changeStyleDisplay('addMethodButtonElement','none');
+        changeInputValue('createDescription','');
+        changeStyleDisplay('editMethodButtonElement','none');
+        changeStyleDisplay('cancelEditMethodButtonElement','none');
+        changeStyleDisplay('createMethod2','none');
+    } else {
+        changeStyleDisplay('createMethod1','block');
+        changeStyleDisplay('addMethodButtonElement','block');
+    }
+}
+
+function addMethod(){
+    const description = document.getElementById('createDescription').value;
+    if(description){
+        var index = methods.length + 1;
+        methods.push({ index , description });
+        updateMethodList();
+        changeInputValue('createDescription','');
+        changeStyleDisplay('createMethod1','none');
+        changeStyleDisplay('addMethodButtonElement','none');
+        createAlertMessage("success","Sucesso!","Passo adicionado com sucesso.");
+    } else {
+        createAlertMessage("warning","Atenção!","Por favor, preencha a descrição do passo.");
+    }
+}
+
+
+
+/* Create Method Functions - End */
+
+/* List Method Functions - Start */
+
+
+function updateMethodList() {
+    const methodList = document.getElementById('methodTableBody');
+    methodList.innerHTML = '';
+    methods.forEach((method, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${method.index}</td>
+            <td>${method.description}</td>
+            <td  class="text-center">
+                <button type="button" class="btn btn-sm btn-primary me-2" onclick="editMethod(${index})">
+                    <i class="bi bi-pencil"></i> Editar
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="deleteMethod(${index})">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </td>
+        `;
+        methodList.appendChild(row);
+    });
+}
+
+/* List Method Functions - End */
+
+
+/* Edit Method Functions - Start */
+
+function editMethod(index) {
+    const method = methods[index];
+    document.getElementById('saveMethodChangesButton').setAttribute('data-edit-index', index);
+    changeStyleDisplay('createMethod1','block');
+    changeStyleDisplay('createMethod2','block');
+    changeStyleDisplay('addMethodButtonElement','none');
+    changeStyleDisplay('editMethodButtonElement','block');
+    changeStyleDisplay('cancelEditMethodButtonElement','block');
+    changeInputValue('createDescription',method.description);
+    const methodIndexList = document.getElementById('createMethodIndex');
+    methodIndexList.innerHTML = '';
+    methods.forEach((method, i) => {
+        const option = document.createElement("option");
+        option.value = i + 1;
+        option.text = i + 1;
+        methodIndexList.appendChild(option);
+    });
+    changeInputValue('createMethodIndex',index+1);
+
+}
+
+function saveMethodChanges() {
+    const index = document.getElementById('saveMethodChangesButton').getAttribute('data-edit-index');
+    const description = document.getElementById('createDescription').value;
+    const newIndex = parseInt(document.getElementById('createMethodIndex').value);
+    if (description) {
+        methods[index].description = description;
+        if (newIndex !== index + 1) {
+            const [movedMethod] = methods.splice(index, 1);
+            methods.splice(newIndex - 1, 0, movedMethod);
+            methods.forEach((method, i) => {
+                method.index = i + 1;
+            });
+        }
+        updateMethodList();
+        changeInputValue('createDescription','');
+        changeStyleDisplay('createMethod1','none');
+        changeStyleDisplay('createMethod2','none');
+        changeStyleDisplay('addMethodButtonElement','none');
+        changeStyleDisplay('editMethodButtonElement','none');
+        changeStyleDisplay('cancelEditMethodButtonElement','none');
+        createAlertMessage("success","Sucesso!","Alterações guardadas com sucesso.");
+    } else {
+        createAlertMessage("warning","Atenção!","Por favor, preencha a descrição do passo.");
+    }
+}
+
+
+function cancelEditMethod() {
+    changeInputValue('createDescription','');
+    changeStyleDisplay('createMethod1','none');
+    changeStyleDisplay('createMethod2','none');
+    changeStyleDisplay('addMethodButtonElement','none');
+    changeStyleDisplay('editMethodButtonElement','none');
+    changeStyleDisplay('cancelEditMethodButtonElement','none');
+}
+
+
+/* Delete Method Functions - Start */
+
+function deleteMethod(index) {
+    methods.splice(index, 1);
+    methods.forEach((method, i) => {
+        method.index = i + 1;
+    });
+    updateMethodList();
+    createAlertMessage("success","Sucesso!","Passo eliminado com sucesso.");
+}
+
+/* Delete Method Functions - End */
+
 
 /* PDF Functions - Start */
 
 function generatePDF() {
     const recipeName = document.getElementById('recipeName').value;
-    //const recipeInstructions = document.getElementById('recipeInstructions').value; 
     if (!recipeName ) {
-        createAlertMessage("warning","Atenção!","Por favor, preencha o nome e as instruções da receita.");
+        createAlertMessage("warning","Atenção!","Por favor, preencha o nome da receita.");
         return;
     }
 
     if (ingredients.length === 0) {
         createAlertMessage("warning","Atenção!","Por favor, adicione pelo menos um ingrediente.");
+        return;
+    }
+    
+    if (methods.length === 0) {
+        createAlertMessage("warning","Atenção!","Por favor, adicione pelo menos um passo do procedimento.");
         return;
     }
 
@@ -177,27 +321,74 @@ function generatePDF() {
     doc.text(recipeName, 10, 15);
 
     //set Ingredients
-    doc.setFontSize(14);
-    doc.text('Ingredientes:', 10, 30);
-    let yPosition = 40;
-    ingredients.forEach((ingredient) => {
-        doc.setFont("arial-nova","normal");
-        doc.setFontSize(12);
-        doc.text(`- ${ingredient.quantity} ${ingredient.unit} de ${ingredient.name}`, 10, yPosition);
-        yPosition += 8;
-    });
-
+    yPosition = addIngredients(doc, 40);
     yPosition += 10;
-    doc.setFontSize(14);
-    doc.setFont("arial-nova","bold");
-    doc.text('Procedimento:', 10, yPosition);
-    yPosition += 10;    
-    //const splitInstructions = doc.splitTextToSize(recipeInstructions, 180);
-    //doc.text(splitInstructions, 10, yPosition);
+    yPosition = addMethodPDF(doc, yPosition);
     doc.save(`${recipeName}.pdf`);
     createAlertMessage("success","Sucesso!","PDF gerado com sucesso.");
 }
 
+
+function createNewPage(doc){
+    doc.addPage();
+    doc = setRetangule(doc);
+    doc = setImage(doc);
+    return doc;
+}
+
+
+function addIngredients(doc, yPosition) {
+    doc.setFontSize(14);
+    doc.text('Ingredientes:', 10, 30);
+    ingredients.forEach((ingredient) => {
+        doc.setFont("arial-nova","normal");
+        doc.setFontSize(12);
+        var text = `- ${ingredient.quantity} ${ingredient.unit} de ${ingredient.name}`;
+        if (yPosition > 280) { 
+            doc = createNewPage(doc);
+            yPosition = 20; 
+        }
+
+        if(text.length > 90){
+            console.log("Text: " + text);
+            console.log("Text Length:" + text.length);
+            const splitText = doc.splitTextToSize(text, 180); 
+            doc.text(splitText, 10, yPosition);
+            yPosition += splitText.length * 6; 
+        } else {
+            doc.text(text, 10, yPosition);
+            yPosition += 8;
+        }
+    });
+    return yPosition;
+}
+
+
+function addMethodPDF(doc, yPosition) {
+    doc.setFontSize(14);
+    doc.setFont("arial-nova","bold");
+    doc.text('Procedimento:', 10, yPosition);
+    yPosition += 10;  
+    methods.forEach((ingredient) => {
+        doc.setFont("arial-nova","normal");
+        doc.setFontSize(12);
+        var text = `${ingredient.index}. ${ingredient.description}`;
+        if (yPosition > 280) { 
+            doc = createNewPage(doc);
+            yPosition = 20; 
+        }
+
+        if(text.length > 90){
+            const splitText = doc.splitTextToSize(text, 180); 
+            doc.text(splitText, 10, yPosition);
+            yPosition += splitText.length * 6;
+        } else {
+            doc.text(text, 10, yPosition);
+            yPosition += 8;
+        }
+    });
+    return yPosition;
+}
 
 function setRetangule(doc){
     const pageWidth = doc.internal.pageSize.getWidth();

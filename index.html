@@ -20,7 +20,7 @@
 
         <div class="container mt-3" >
             <div class="mb-3">
-                <label for="exampleFormControlInput1" class="form-label">Titulo da receita</label>
+                <label for="exampleFormControlInput1" class="form-label"><b>Título da receita</b></label>
                 <input type="text" class="form-control" id="recipeName" placeholder="Ex: Bolo de Chocolate">
             </div>
        
@@ -33,23 +33,24 @@
                 </div>
 
                 <div class="col-md-6 mb-3" id="createIngridient1" style="display: none;" >
-                    <label for="createProductName">Nome do Ingrediente</label>
+                    <label for="createProductName"><b>Nome do Ingrediente</b></label>
                     <input type="text" id="createProductName" name="createProductName"  class="form-control" placeholder="Digite o nome do ingrediente" >
                 </div>
                 <div class="col-md-6 mb-3" id="createIngridient2"  style="display: none;">
-                    <label for="createIngridientUnit">Unidade de Medida</label>
+                    <label for="createIngridientUnit"><b>Unidade de Medida</b></label>
                     <select id="createIngridientUnit" name="createIngridientUnit" class="form-control" >
                         <option value="" disabled selected>Selecione um tipo de medida</option>
                         <option value="Unidade" >Unidade</option>
                         <option value="Gramas" >Gramas</option>
                         <option value="Kg" >Kg</option>
                         <option value="Mililitro" >Mililitro</option>
+                        <option value="Colher de Sopa" >Colher de Sopa</option>
                         <option value="Litro" >Litro</option>
                        <!-- <option value="Outros" >Outros</option>-->
                     </select>
                 </div>
                 <div class="col-md-4 mb-3" id="createIngridient3" style="display: none;">
-                    <label for="createIngridientQuantity">Quantidade</label>
+                    <label for="createIngridientQuantity"><b>Quantidade</b></label>
                     <input type="number" id="createIngridientQuantity" name="createIngridientQuantity"  class="form-control" placeholder="Digite a quantidade" >
                 </div>
 
@@ -91,22 +92,68 @@
                         </table>
                     </div>
                 </div>
-<!--
+
                 
 
                 <div class="col-md-12 mb-3" >
-                    <button type="button" id="toggleButton" class="btn btn-success btn-sm mb-3 ml-2" onclick="">
+                    <button type="button" id="toggleButton" class="btn btn-success btn-sm mb-3 ml-2" onclick="showFormMethod()">
                         <i class="fas fa-plus"></i> Adicionar Passo
                     </button>
                 </div>
 
                 <div class="mt-2">
                     <h2>Procedimento: </h2>
-                 </div>
+                </div>
 
-                 TO DO Table
+                <!-- Table for Method-->
+                <div class="col-md-12 mb-3">
+                    <div class="table-responsive shadow-sm rounded">
+                        <table class="table table-striped table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                            <th class="col-2">Nº do Passo</th>
+                            <th class="col-7">Descrição</th>
+                            <th class="col-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="methodTableBody">
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                 -->
+
+
+
+                <div class="col-md-6 mb-3" id="createMethod2"  style="display: none;">
+                    <label for="createMethodIndex"><b>Nº do Passo</b></label>
+                    <select id="createMethodIndex" name="createMethodIndex" class="form-control" >
+                    </select>
+                </div>
+                <div class="col-md-12 mb-3" id="createMethod1" style="display: none;" >
+                    <label for="createDescription"><b>Descrição do Passo</b></label>
+                    <textarea id="createDescription" placeholder="Digite a descrição do passo" name="createDescription"  class="form-control" rows="4"></textarea>
+                </div>
+                <div id="addMethodButtonElement" class="col-md-12 mb-3" style="left:0%; display: none;">
+                    <button type="button" class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2" onclick="addMethod()">
+                        <i class="bi bi-plus-circle"></i> Adicionar à Tabela
+                    </button>
+                </div>
+
+                 <div id="cancelEditMethodButtonElement" class="col-12 mb-3" style="left:0%; display: none;">
+                    <button type="button" id="cancelEditChangesButton" class="btn btn-warning w-100 d-flex align-items-center justify-content-center gap-2" onclick="cancelEditMethod()">
+                        <i class="bi bi-x-circle"></i>Cancelar 
+                    </button>
+                </div>
+                <div id="editMethodButtonElement" class="col-12 mb-3" style="left:0%; display: none;">
+                    <button type="button" id="saveMethodChangesButton" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2" onclick="saveMethodChanges()">
+                        <i class="bi bi-check-circle"></i>Guardar Alterações
+                    </button>
+                </div>
+
+                
+
+                 
 
                 <div class="col-md-12 mb-3">
                     <button type="button" class="btn btn-danger  w-100 d-flex align-items-center justify-content-center gap-2" onclick="generatePDF()">
